@@ -25,15 +25,11 @@ class Conv2D(w: SDVariable, b: SDVariable, k: Int)(implicit sd: SameDiff) extend
 }
 
 object Links {
-  private var counter = 0
-
   def linear(in: Int, out: Int)(implicit sd: SameDiff): Chain = {
-    val W = sd.`var`(out, in)
+    val W = sd.`var`(in, out)
     W.setWeightInitScheme(XavierInitScheme.builder().order('c').fanIn(in).fanOut(out).build())
     val b = sd.`var`(out)
     b.setWeightInitScheme(ZeroInitScheme.builder().order('c').build())
-
-    counter += 1
 
     W.storeAndAllocateNewArray()
     b.storeAndAllocateNewArray()
@@ -51,9 +47,6 @@ object Links {
     W.storeAndAllocateNewArray()
     b.storeAndAllocateNewArray()
 
-    counter += 1
-
     new Conv2D(W, b, kernelSize)
   }
-
 }
