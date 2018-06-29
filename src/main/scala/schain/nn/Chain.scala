@@ -8,7 +8,8 @@ abstract class Chain(sd: SameDiff) {
   def forward(x: SDVariable): SDVariable
 
   def apply(x: INDArray): SDVariable = {
-    forward(sd.`var`(x))
+    val tape: SameDiff = sd.dup()
+    forward(tape.`var`(x))
   }
 
   def apply(x: SDVariable): SDVariable = {

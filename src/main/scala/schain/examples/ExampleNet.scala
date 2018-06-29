@@ -1,8 +1,11 @@
 package schain.examples
 
 import org.nd4j.autodiff.samediff.{SDVariable, SameDiff}
-import org.nd4j.linalg.factory.Nd4j
+import org.nd4j.autodiff.execution.NativeGraphExecutioner
+
+import org.nd4j.autodiff.execution.conf.ExecutorConfiguration
 import schain.nn.{Chain, Functions => F, Links => L}
+import org.nd4j.linalg.factory.Nd4j
 
 class MyNet(implicit sd: SameDiff) extends Chain(sd) {
   private val conv1 = L.conv2d(inChannels = 1, outChannels = 6, kernelSize = 5)
@@ -30,13 +33,22 @@ class MyNet(implicit sd: SameDiff) extends Chain(sd) {
 
 object ExampleNet {
   def main(args: Array[String]): Unit = {
-    implicit val sd: SameDiff = SameDiff.create()
-    val model = new MyNet()
+    Nd4j.getExecutioner.enableDebugMode(true)
+    Nd4j.getExecutioner.enableVerboseMode(true)
 
-    val out = model(Nd4j.rand(Array(1, 1, 32, 32), 42))
+    implicit var sd: SameDiff = SameDiff.create()
+
+    val model = new MyNet()
+    val out = model(Nd4j.ones(1, 1, 32, 32))
+
+    println("Init Graph")
+    println(sd.summary())
+
+    println("Forward Graph")
+    println(out.getSameDiff.summary())
 
     println("Forwards:")
-    println(out.getSameDiff.execAndEndResult())
+    println(out.eval())
 
     println("Backwards:")
     val grad = out.gradient()

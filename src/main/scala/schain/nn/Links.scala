@@ -6,7 +6,7 @@ import org.nd4j.weightinit.impl.{XavierInitScheme, ZeroInitScheme}
 
 class Linear2(w: SDVariable, b: SDVariable)(implicit sd: SameDiff) extends Chain(sd) {
   override def forward(x: SDVariable): SDVariable = {
-    sd.xwPlusB(x, w, b)
+    x.getSameDiff.xwPlusB(x, w, b)
   }
 }
 
@@ -20,7 +20,7 @@ class Conv2D(w: SDVariable, b: SDVariable, k: Int)(implicit sd: SameDiff) extend
     .build()
 
   override def forward(x: SDVariable): SDVariable = {
-    sd.conv2d(Array(x, w, b), config)
+    x.getSameDiff.conv2d(Array(x, w, b), config)
   }
 }
 
