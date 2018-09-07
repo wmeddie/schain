@@ -10,8 +10,8 @@ class MyNet(implicit sd: SameDiff) extends Chain(sd) {
   private val conv1 = L.conv2d(inChannels = 1, outChannels = 6, kernelSize = 5)
   private val conv2 = L.conv2d(inChannels = 6, outChannels = 16, kernelSize = 5)
 
-  //private val fc1 = L.linear(in = 16 * 5 * 5, out = 120)
-  private val fc1 = L.linear(in = 32 * 32, out = 120)
+  private val fc1 = L.linear(in = 16 * 5 * 5, out = 120)
+  //private val fc1 = L.linear(in = 32 * 32, out = 120)
   private val fc2 = L.linear(in = 120, out = 84)
   private val fc3 = L.linear(in = 84, out = 10)
 
@@ -36,14 +36,14 @@ object ExampleNet {
     Nd4j.getExecutioner.enableDebugMode(true)
     Nd4j.getExecutioner.enableVerboseMode(true)
 
-    implicit var sd: SameDiff = SameDiff.create()
+    implicit var graph: SameDiff = SameDiff.create()
 
     val model = new MyNet()
-    //val out = model(Nd4j.ones(1, 1, 32, 32))
+    //val out = model(Nd4j.ones(1, 32, 32, 1))
     val out = model(Nd4j.ones(1, 32 * 32))
 
     println("Init Graph")
-    println(sd.summary())
+    println(graph.summary())
 
     println("Forward Graph")
     println(out.getSameDiff.summary())
@@ -51,8 +51,9 @@ object ExampleNet {
     println("Forwards:")
     println(out.eval())
 
+    out.getSameDiff.execBackwards()
     println("Backwards:")
-    val grad = out.gradient()
-    //println(grad.eval())
+    val grad = out.gradient().getArr
+    println(grad)
   }
 }

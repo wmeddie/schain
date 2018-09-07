@@ -22,16 +22,16 @@
             <artifactId>scala-library</artifactId>
             <version>${scala.version}</version>
         </dependency>
-        <dependency>
+        <!--dependency>
             <groupId>org.nd4j</groupId>
-            <artifactId>nd4j-native</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <artifactId>nd4j-native-platform</artifactId>
+            <version>1.0.0-beta2</version>
             <classifier>windows-x86_64</classifier>
-        </dependency>
+        </dependency-->
         <dependency>
             <groupId>org.nd4j</groupId>
             <artifactId>nd4j-native-platform</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>1.0.0-beta2</version>
         </dependency>
     </dependencies>
     <repositories>
