@@ -17,7 +17,6 @@ class Conv2D(w: SDVariable, b: SDVariable, k: Int)(implicit sd: SameDiff) extend
     .sH(1).sW(1)
     .dH(1).dW(1)
     .isSameMode(true)
-    .isNHWC(true)
     .build()
 
   override def forward(x: SDVariable): SDVariable = {

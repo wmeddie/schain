@@ -18,6 +18,14 @@ object Functions {
     v.getSameDiff.relu(v, 0.0)
   }
 
+  def softmax(v: SDVariable): SDVariable = {
+    v.getSameDiff.softmax(v)
+  }
+
+  def logSoftmax(v: SDVariable): SDVariable = {
+    v.getSameDiff.logSoftmax(v)
+  }
+
   def view(v: SDVariable, x: Int, y: Int): SDVariable = {
     v.getSameDiff.reshape(v, x, y)
   }

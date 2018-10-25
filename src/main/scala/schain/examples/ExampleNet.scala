@@ -24,9 +24,7 @@ class MyNet(implicit sd: SameDiff) extends Chain(sd) {
     //x = F.view(x, 1, 400)
     x = F.relu(fc1(x))
     x = F.relu(fc2(x))
-    x = F.relu(fc3(x))
-
-    x
+    fc3(x)
   }
 }
 
@@ -40,7 +38,10 @@ object ExampleNet {
 
     val model = new MyNet()
     //val out = model(Nd4j.ones(1, 32, 32, 1))
-    val out = model(Nd4j.ones(1, 32 * 32))
+    val out = model(Nd4j.zeros(1L, 32 * 32L))
+
+    val labels = Nd4j.zeros(1L, 10L)
+    labels.putScalar(Array[Int](0, 0), 1.0F)
 
     println("Init Graph")
     println(graph.summary())
@@ -51,9 +52,14 @@ object ExampleNet {
     println("Forwards:")
     println(out.eval())
 
-    out.getSameDiff.execBackwards()
+    val loss = graph.lossSoftmaxCrossEntropy("loss", graph.`var`(labels), out)
+
+    println("Loss:")
+    println(loss.eval())
+
+    loss.getSameDiff.execBackwards()
     println("Backwards:")
-    val grad = out.gradient().getArr
+    val grad = loss.gradient().getArr
     println(grad)
   }
 }
