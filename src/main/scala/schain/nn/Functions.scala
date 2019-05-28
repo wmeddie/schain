@@ -19,11 +19,11 @@ object Functions {
   }
 
   def softmax(v: SDVariable): SDVariable = {
-    v.getSameDiff.softmax(v)
+    v.getSameDiff.nn.softmax(v)
   }
 
   def logSoftmax(v: SDVariable): SDVariable = {
-    v.getSameDiff.logSoftmax(v)
+    v.getSameDiff.nn.logSoftmax(v)
   }
 
   def view(v: SDVariable, x: Int, y: Int): SDVariable = {
