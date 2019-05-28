@@ -62,7 +62,10 @@ object ExampleNet {
 
     println("Backwards:")
     loss.getSameDiff.execBackwards(null)
-    val variable = loss.getSameDiff.grad("loss")
-    println(variable.eval())
+
+    for (i <- 0 to 10) {
+      val variable = loss.getSameDiff.grad(s"sd_var_$i")
+      println(variable.eval())
+    }
   }
 }
