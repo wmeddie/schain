@@ -23,9 +23,9 @@ class MyNet(implicit sd: SameDiff) extends Chain(sd) {
     x = F.view(x, 1, 400)
     x = F.relu(fc1(x))
     x = F.relu(fc2(x))
-    x = F.relu(fc3(x))
+    x = F.softmax(fc3(x))
 
-    F.softmax(x)
+    x
   }
 }
 
@@ -38,6 +38,7 @@ object ExampleNet {
     implicit var graph: SameDiff = SameDiff.create()
 
     val model = new MyNet()
+
     val input = Nd4j.ones(1, 32, 32, 1)
     val out = model(input)
 
