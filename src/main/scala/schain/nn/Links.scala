@@ -1,12 +1,13 @@
 package schain.nn
 
-import org.nd4j.autodiff.samediff.{SDVariable, SameDiff}
+import org.nd4j.autodiff.samediff.{SDVariable, SameDiff, VariableType}
+import org.nd4j.linalg.api.buffer.DataType
 import org.nd4j.linalg.api.ops.impl.layers.convolution.config.Conv2DConfig
 import org.nd4j.weightinit.impl.{XavierInitScheme, ZeroInitScheme}
 
 class Linear2(w: SDVariable, b: SDVariable)(implicit sd: SameDiff) extends Chain(sd) {
   override def forward(x: SDVariable): SDVariable = {
-    x.getSameDiff.linear(x, w, b)
+    x.getSameDiff.nn.linear(x, w, b)
   }
 }
 
@@ -16,20 +17,22 @@ class Conv2D(w: SDVariable, b: SDVariable, k: Int)(implicit sd: SameDiff) extend
     .pH(0).pW(0)
     .sH(1).sW(1)
     .dH(1).dW(1)
-    .isSameMode(true)
+    .isSameMode(false)
+    .dataFormat("NHWC")
     .build()
 
   override def forward(x: SDVariable): SDVariable = {
-    x.getSameDiff.conv2d(Array(x, w, b), config)
+    x.getSameDiff.cnn.conv2d(Array(x, w, b), config)
   }
 }
 
 object Links {
   def linear(in: Int, out: Int)(implicit sd: SameDiff): Chain = {
-    val W = sd.`var`(in, out)
-    W.setWeightInitScheme(XavierInitScheme.builder().order('c').fanIn(in).fanOut(out).build())
-    val b = sd.`var`(out)
-    b.setWeightInitScheme(ZeroInitScheme.builder().order('c').build())
+    val weightInitScheme = XavierInitScheme.builder().order('c').fanIn(in).fanOut(out).build()
+    val W = sd.`var`(weightInitScheme, DataType.FLOAT, in, out)
+
+    val biasWeightInitScheme = ZeroInitScheme.builder().order('c').build()
+    val b = sd.`var`(biasWeightInitScheme, DataType.FLOAT, out)
 
     W.storeAndAllocateNewArray()
     b.storeAndAllocateNewArray()
@@ -38,11 +41,11 @@ object Links {
   }
 
   def conv2d(inChannels: Int, outChannels: Int, kernelSize: Int)(implicit sd: SameDiff): Chain = {
-    val W = sd.`var`(outChannels, inChannels, kernelSize, kernelSize)
-    W.setWeightInitScheme(XavierInitScheme.builder().order('c').fanIn(inChannels).fanOut(outChannels).build())
+    val weightInitScheme = XavierInitScheme.builder().order('c').fanIn(inChannels).fanOut(outChannels).build()
+    val W = sd.`var`(weightInitScheme, DataType.FLOAT, kernelSize, kernelSize, inChannels, outChannels)
 
-    val b = sd.`var`(1, outChannels * inChannels)
-    b.setWeightInitScheme(ZeroInitScheme.builder().order('c').build())
+    val biasInitScheme = ZeroInitScheme.builder().order('c').build()
+    val b = sd.`var`(biasInitScheme, DataType.FLOAT, 1, outChannels)
 
     W.storeAndAllocateNewArray()
     b.storeAndAllocateNewArray()
