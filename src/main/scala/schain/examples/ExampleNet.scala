@@ -32,8 +32,8 @@ class MyNet(implicit sd: SameDiff) extends Chain(sd) {
 
 object ExampleNet {
   def main(args: Array[String]): Unit = {
-    Nd4j.getExecutioner.enableDebugMode(true)
-    Nd4j.getExecutioner.enableVerboseMode(true)
+    //Nd4j.getExecutioner.enableDebugMode(true)
+    //Nd4j.getExecutioner.enableVerboseMode(true)
 
     implicit var graph: SameDiff = SameDiff.create()
 
@@ -61,7 +61,8 @@ object ExampleNet {
     println(loss.eval())
 
     println("Backwards:")
-    val grad = loss.gradient()
-    println(grad)
+    loss.getSameDiff.execBackwards(null)
+    val variable = loss.getSameDiff.grad("loss")
+    println(variable.eval())
   }
 }
